@@ -1,9 +1,21 @@
-// require discord.js module and config file
+// require discord.js, command files, and config file
+const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
 
 // create new Discord client
 const client = new Discord.Client();
+
+// create new collection
+client.commands = new Discord.Collection();
+
+// import command files
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    client.commands.set(command.name, command);
+}
 
 // welcome message
 client.once('ready', () => {
@@ -12,17 +24,18 @@ client.once('ready', () => {
 
 // command handler
 client.on('message', message => {
-    // slice user input into space-seperated array
-    const args = message.content.slice(prefix.length)
-    // strips off prefix and removes case sensitivity
-    const command = args.shift().toLowerCase();
-    // ignore message that don't contain the prefix or are from a bot
-    if (!message.content.startsWith(prefix) || message.author.bot) {
-        return;
-    }
-    // conditional statements for commands
-    else if (command === 'hello' || 'hi') {
-        return message.channel.send('Greetings Guardian.')
+	if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+	const args = message.content.slice(prefix.length).split(/ +/);
+	const command = args.shift().toLowerCase();
+
+    if (!client.commands.has(command)) return;
+    
+    try {
+        client.commands.get(command).execute(message, args);
+    } catch (error) {
+        console.error(error);
+        message.reply(`\`\`\`css\n[ERROR: command handler failed to recognize input]\`\`\``);
     }
 });
 
