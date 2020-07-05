@@ -1,7 +1,7 @@
 module.exports = {
     name: 'hello',
     description: 'Greetings from Voluspa!',
-    execute(msg, args) {
-        msg.channel.send('Greetings guardian. I am the warmind Voluspa, engineered by guardians, for guardians.');
+    execute(message, args, bungiekey) {
+        message.channel.send('Greetings guardian. I am the warmind Voluspa, engineered by guardians, for guardians.\nRun \`>help\` to see all available commands.');
     },
 };
