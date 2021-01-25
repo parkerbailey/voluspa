@@ -45,14 +45,21 @@ prefix = ">"	# defines server command prefix
 @client.event	# registers client event
 async def on_ready():	# asynchronous callback function that runs when bot is ready
 	print("Voluspa loggged in as {0.user}".format(client))
+	return await client.change_presence(game = discord.Game("Command Processing"))
 
 @client.event	# registers different client event
 async def on_message(message):	# function executes on client message
 	if message.author == client.user:	# runs if message is from bot
 		return
+
 	# command section
-	if message.content.startswith(prefix):	# runs function if message starts with prefix
-		pass
+	if message.content == prefix + "react":	# runs function if message starts with prefix
+		@client.command(pass_context = True)
+		async def whoami(ctx):
+			if ctx.message.author.server_permissions.administrator:
+				await client.send_message(ctx.message.channel, "You're a server admin so you can use this command.")
+			else:
+				await client.send_message(ctx.message.channel, "You are not a server admin so you cannot use this command.")
 
 	# non-command section
 	if "happy birthday" in message.content.lower(): # happy birthday message
